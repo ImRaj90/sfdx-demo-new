@@ -1,0 +1,84 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: 
+- main
+
+parameters:
+- name: ManualCommitIDFrom
+  type: string
+  default: 891d5feec1eb1533507d31d74395f622c407ab0b
+- name: ManualCommitIDTo
+  type: string
+  default: head
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- checkout: self
+  persistCredentials: true
+
+- script: |
+   echo Hello, world!
+   git config --global user.email "rajashekar231@outlook.com"
+   git config --global user.name "rajashekar231"
+   git pull origin
+   git checkout main
+   head=$(git log --format="%H" -n 1)
+   echo $head
+   git branch --all
+   git log
+   ls -ltra
+   git diff --name-only 891d5feec1eb1533507d31d74395f622c407ab0b
+  displayName: 'Run a one-line script'
+
+- script: |
+     echo "Manual Commit ID from is "
+     echo ${{ parameters.ManualCommitIDFrom }}
+     echo "Manual Commit ID to is "
+     echo ${{ parameters.ManualCommitIDTo }}
+     tree /home
+     ls -ltr /home/vsts/work/
+     ls -ltr
+     pwd
+  displayName: 'Enter Manual Commit ID:'
+
+- script: | 
+    npm install sfdx-cli -g
+    sfdx --version
+    echo 'y' | sfdx plugins:install sfpowerkit
+    echo 'y' | sfdx plugins:install @dxatscale/sfpowerscripts
+  displayName: 'install sfdx-cli and sfpowerkit'
+
+- script: | 
+    sfdx sfpowerkit:auth:login -u $(USERNAME) -p $(PASSWORD) -a myorg -r $(SANDBOX_URL) -s $(SECURITYTOKEN)
+  displayName: 'Authorizing the org'
+
+- script: |
+     echo find the diff here
+     pwd
+     ls -ltr
+     git checkout main
+      head=$(git log --format="%H" -n 1)
+      echo $head
+      git branch --all
+      git log
+     echo head is $head
+     sfdx sfpowerkit:project:diff --revisionfrom ${{ parameters.ManualCommitIDFrom }} --revisionto $head --output config/deltapkg
+     tree config/deltapkg
+  displayName: 'Generate Delta'
+
+- script: |
+    sfdx force:source:deploy -c -p config/deltapkg/force-app -u myorg
+  displayName: 'Perform checkonly Deployment'
+
+- script: |
+    sfdx force:source:deploy -p config/deltapkg/force-app -u myorg
+  displayName: 'Perform Deployment'
+

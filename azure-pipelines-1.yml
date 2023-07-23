@@ -1,0 +1,33 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- checkout: self
+  persistCredentials: true
+
+- script: |
+   echo Hello, world!
+   git config --global user.email "rajashekar231@outlook.com"
+   git config --global user.name "rajashekar231"
+   git pull origin
+   git checkout main
+   head=$(git log --format="%H" -n 1)
+   echo $head
+   git branch --all
+   git log
+   ls -ltra
+   git diff --name-only 891d5feec1eb1533507d31d74395f622c407ab0b
+  displayName: 'Run a one-line script'
+
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+  displayName: 'Run a multi-line script'

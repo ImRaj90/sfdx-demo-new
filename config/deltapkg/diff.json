@@ -1,0 +1,16 @@
+[
+  {
+    "action": "Deploy",
+    "metadataType": "ApexClass",
+    "componentName": "MySampleApexClass",
+    "message": "",
+    "path": "config\\deltapkg\\force-app\\main\\default\\classes\\MySampleApexClass.cls-meta.xml"
+  },
+  {
+    "action": "Deploy",
+    "metadataType": "ApexClass",
+    "componentName": "MySampletestClass",
+    "message": "",
+    "path": "config\\deltapkg\\force-app\\main\\default\\classes\\MySampletestClass.cls-meta.xml"
+  }
+]
